@@ -121,14 +121,6 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-8 rounded-2xl border-2 border-dashed border-dark-200 p-4">
-            <p className="mb-2 text-xs font-bold text-dark-500 uppercase tracking-wider">Demo Credentials</p>
-            <div className="space-y-1 text-sm text-dark-600">
-              <p><span className="font-semibold">User:</span> user@test.com / password123</p>
-              <p><span className="font-semibold">Admin:</span> admin@test.com / admin123</p>
-            </div>
-          </div>
-
           <p className="mt-6 text-center text-sm text-dark-500">
             Don't have an account?{" "}
             <Link href="/register" className="font-bold text-primary-600 hover:text-primary-700">
