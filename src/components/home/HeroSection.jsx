@@ -102,14 +102,14 @@ export default function HeroSection() {
           </div>
 
           {/* Floating food emojis visual */}
-          <div className="relative hidden h-[500px] lg:block">
+          <div className="relative hidden h-125 lg:block">
             {/* Central plate */}
             <motion.div
               animate={{ rotate: [0, 5, 0, -5, 0] }}
               transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
             >
-              <div className="flex h-56 w-56 items-center justify-center rounded-full bg-gradient-to-br from-primary-500/30 to-accent-400/20 shadow-2xl shadow-primary-500/20 text-9xl">
+              <div className="flex h-56 w-56 items-center justify-center rounded-full bg-linear-to-br from-primary-500/30 to-accent-400/20 shadow-2xl shadow-primary-500/20 text-9xl">
                 🍽️
               </div>
             </motion.div>

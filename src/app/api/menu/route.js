@@ -47,7 +47,7 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { name, price, category, image, available } = body;
+    const { name, price, category, image, imageKey, available } = body;
     if (!name || price === undefined || !category) {
       return NextResponse.json(
         { success: false, message: "Name, price, and category are required" },
@@ -60,6 +60,7 @@ export async function POST(request) {
       price,
       category,
       image: image || "",
+      imageKey: imageKey || "",
       available: available ?? true,
     });
 

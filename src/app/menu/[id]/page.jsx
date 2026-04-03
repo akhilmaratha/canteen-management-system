@@ -86,7 +86,7 @@ export default function FoodDetailPage() {
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              className="flex items-center justify-center rounded-3xl bg-gradient-to-br from-primary-50 to-accent-300/20 p-12 shadow-lg"
+              className="flex items-center justify-center rounded-3xl bg-linear-to-br from-primary-50 to-accent-300/20 p-12 shadow-lg"
             >
               <span className="text-[10rem]">{emoji}</span>
             </motion.div>

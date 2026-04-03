@@ -41,7 +41,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-dark-950 flex">
       {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-gradient-to-br from-dark-950 via-dark-900 to-primary-900/20 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-linear-to-br from-dark-950 via-dark-900 to-primary-900/20 relative overflow-hidden">
         <div className="absolute -top-40 -right-20 h-80 w-80 rounded-full bg-primary-500/15 blur-3xl" />
         <div className="absolute -bottom-40 -left-20 h-80 w-80 rounded-full bg-accent-400/10 blur-3xl" />
         <div className="relative">
@@ -55,7 +55,7 @@ export default function LoginPage() {
         <div className="relative">
           <div className="mb-6 text-8xl">🍔</div>
           <h2 className="mb-4 text-5xl font-black leading-tight text-white">
-            Hungry? <br /><span className="text-primary-400">We've got you.</span>
+            Hungry? <br /><span className="text-primary-400">We&apos;ve got you.</span>
           </h2>
           <p className="text-lg text-white/50">Order fresh campus canteen food — no queues, no hassle.</p>
           <div className="mt-8 flex gap-4">
@@ -122,7 +122,7 @@ export default function LoginPage() {
           </form>
 
           <p className="mt-6 text-center text-sm text-dark-500">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/register" className="font-bold text-primary-600 hover:text-primary-700">
               Sign up free
             </Link>

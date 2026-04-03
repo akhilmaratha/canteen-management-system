@@ -4,13 +4,14 @@ import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import { formatCurrency } from "@/utils/helpers";
 import { Star, Plus, Pencil, Trash2, ShoppingCart } from "lucide-react";
+import Image from "next/image";
 
 const FOOD_EMOJIS = { "Starters": "🥗", "Main Course": "🍛", "Beverages": "🥤", "Desserts": "🍨", "Snacks": "🍟", "Breakfast": "🍳" };
 
 export default function FoodCard({ food, onAdd, onEdit, onDelete, adminMode = false }) {
   const emoji = FOOD_EMOJIS[food.category] || "🍽️";
-  const rating = food.rating || (4 + Math.random()).toFixed(1);
-  const reviews = food.reviews || Math.floor(Math.random() * 200 + 50);
+  const rating = food.rating;
+  const reviews = food.reviews ;
 
   return (
     <motion.div
@@ -21,9 +22,9 @@ export default function FoodCard({ food, onAdd, onEdit, onDelete, adminMode = fa
       className="group overflow-hidden rounded-2xl bg-white shadow-md shadow-dark-200/30 border border-dark-100 hover:shadow-xl hover:shadow-primary-500/10 hover:border-primary-200 transition-all duration-300"
     >
       {/* Image / Placeholder */}
-      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary-50 to-accent-300/20">
+      <div className="relative h-48 overflow-hidden bg-linear-to-br from-primary-50 to-accent-300/20">
         {food.image && food.image.startsWith("/") && food.image !== "/next.svg" ? (
-          <img src={food.image} alt={food.name} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" />
+          <Image src={food.image} alt={food.name} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" width={200} height={200} />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
             <span className="text-7xl">{emoji}</span>

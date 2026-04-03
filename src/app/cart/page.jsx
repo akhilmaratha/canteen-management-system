@@ -60,7 +60,7 @@ export default function CartPage() {
             >
               <span className="mb-6 text-8xl">🛒</span>
               <h2 className="mb-2 text-2xl font-bold text-dark-800">Your cart is empty</h2>
-              <p className="mb-8 text-dark-500">Looks like you haven't added anything yet</p>
+              <p className="mb-8 text-dark-500">Looks like you haven&apos;t added anything yet</p>
               <Link href="/menu">
                 <Button size="lg" icon={ShoppingCart}>Browse Menu</Button>
               </Link>

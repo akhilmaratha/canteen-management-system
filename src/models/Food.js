@@ -21,6 +21,10 @@ const foodSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    imageKey: {
+      type: String,
+      default: "",
+    },
     available: {
       type: Boolean,
       default: true,

@@ -22,7 +22,7 @@ export default function AdminUsersPage() {
       });
       if (!res.ok) throw new Error("Failed to fetch users");
       const data = await res.json();
-      setUsers(data.users || data || []);
+      setUsers(data.data || data.users || []);
     } catch (err) {
       toast.error(err.message);
       setUsers([]);

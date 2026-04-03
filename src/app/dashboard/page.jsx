@@ -55,7 +55,7 @@ export default function DashboardPage() {
       <Navbar />
       <main className="min-h-screen bg-dark-50">
         {/* Hero banner */}
-        <div className="bg-gradient-to-r from-dark-950 to-primary-900/30 py-14">
+        <div className="bg-linear-to-r from-dark-950 to-primary-900/30 py-14">
           <div className="mx-auto max-w-7xl px-4 lg:px-8">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <p className="mb-1 text-sm font-semibold text-primary-400">{greeting} 👋</p>

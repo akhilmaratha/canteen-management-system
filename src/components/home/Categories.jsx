@@ -1,18 +1,43 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { getMenu } from "@/services/menuService";
 
 const CATEGORIES = [
-  { name: "Starters", emoji: "🥗", count: "12 items", gradient: "from-green-400 to-emerald-500", href: "/menu?category=Starters" },
-  { name: "Main Course", emoji: "🍛", count: "24 items", gradient: "from-primary-400 to-primary-600", href: "/menu?category=Main+Course" },
-  { name: "Beverages", emoji: "🧃", count: "15 items", gradient: "from-cyan-400 to-blue-500", href: "/menu?category=Beverages" },
-  { name: "Desserts", emoji: "🍰", count: "10 items", gradient: "from-pink-400 to-rose-500", href: "/menu?category=Desserts" },
-  { name: "Snacks", emoji: "🍟", count: "18 items", gradient: "from-accent-400 to-orange-500", href: "/menu?category=Snacks" },
-  { name: "Breakfast", emoji: "🍳", count: "8 items", gradient: "from-amber-400 to-yellow-500", href: "/menu?category=Breakfast" },
+  { name: "Starters", emoji: "🥗", gradient: "from-green-400 to-emerald-500", href: "/menu?category=Starters" },
+  { name: "Main Course", emoji: "🍛", gradient: "from-primary-400 to-primary-600", href: "/menu?category=Main+Course" },
+  { name: "Beverages", emoji: "🧃", gradient: "from-cyan-400 to-blue-500", href: "/menu?category=Beverages" },
+  { name: "Desserts", emoji: "🍰", gradient: "from-pink-400 to-rose-500", href: "/menu?category=Desserts" },
+  { name: "Snacks", emoji: "🍟", gradient: "from-accent-400 to-orange-500", href: "/menu?category=Snacks" },
+  { name: "Breakfast", emoji: "🍳", gradient: "from-amber-400 to-yellow-500", href: "/menu?category=Breakfast" },
 ];
 
 export default function Categories() {
+  const [foods, setFoods] = useState([]);
+
+  useEffect(() => {
+    async function fetchMenu() {
+      try {
+        const response = await getMenu();
+        setFoods(Array.isArray(response?.data) ? response.data : []);
+      } catch {
+        setFoods([]);
+      }
+    }
+
+    fetchMenu();
+  }, []);
+
+  const categoryCounts = useMemo(() => {
+    return foods.reduce((acc, item) => {
+      if (!item?.category) return acc;
+      acc[item.category] = (acc[item.category] || 0) + 1;
+      return acc;
+    }, {});
+  }, [foods]);
+
   return (
     <section className="py-20 bg-dark-50">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
@@ -38,10 +63,10 @@ export default function Categories() {
               whileHover={{ y: -8, scale: 1.05 }}
             >
               <Link href={cat.href} className="block">
-                <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${cat.gradient} p-6 text-center text-white shadow-lg cursor-pointer group`}>
+                <div className={`relative overflow-hidden rounded-2xl bg-linear-to-br ${cat.gradient} p-6 text-center text-white shadow-lg cursor-pointer group`}>
                   <div className="mb-3 text-5xl">{cat.emoji}</div>
                   <h3 className="text-sm font-black">{cat.name}</h3>
-                  <p className="mt-0.5 text-xs text-white/70">{cat.count}</p>
+                  <p className="mt-0.5 text-xs text-white/70">{categoryCounts[cat.name] || 0} items</p>
                   <div className="absolute -bottom-4 -right-4 h-16 w-16 rounded-full bg-white/10" />
                   <div className="absolute -top-4 -left-4 h-12 w-12 rounded-full bg-white/10" />
                 </div>

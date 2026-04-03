@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { getTokenFromRequest, verifyToken } from "@/lib/jwt";
+import { deleteImage } from "@/lib/cloudinary";
 import Food from "@/models/Food";
 
 function getAuthUser(request) {
@@ -32,17 +33,26 @@ export async function PUT(request, { params }) {
       );
     }
 
+    const existingFood = await Food.findById(params.id);
+    if (!existingFood) {
+      return NextResponse.json(
+        { success: false, message: "Food item not found" },
+        { status: 404 }
+      );
+    }
+
     const body = await request.json();
     const food = await Food.findByIdAndUpdate(params.id, body, {
       new: true,
       runValidators: true,
     });
 
-    if (!food) {
-      return NextResponse.json(
-        { success: false, message: "Food item not found" },
-        { status: 404 }
-      );
+    if (existingFood.imageKey && existingFood.imageKey !== body.imageKey) {
+      try {
+        await deleteImage(existingFood.imageKey);
+      } catch {
+        // Best-effort cleanup only.
+      }
     }
 
     return NextResponse.json(
@@ -80,6 +90,14 @@ export async function DELETE(request, { params }) {
         { success: false, message: "Food item not found" },
         { status: 404 }
       );
+    }
+
+    if (food.imageKey) {
+      try {
+        await deleteImage(food.imageKey);
+      } catch {
+        // Best-effort cleanup only.
+      }
     }
 
     return NextResponse.json(

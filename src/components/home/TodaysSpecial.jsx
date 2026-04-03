@@ -19,7 +19,7 @@ export default function TodaysSpecial() {
           className="mb-12 text-center"
         >
           <p className="mb-2 text-sm font-bold uppercase tracking-widest text-primary-500">✨ Daily Pick</p>
-          <h2 className="text-4xl font-black text-dark-900">Today's Special</h2>
+          <h2 className="text-4xl font-black text-dark-900">Today&apos;s Special</h2>
           <p className="mt-2 text-dark-500">Handpicked by our chef — available today only</p>
         </motion.div>
 

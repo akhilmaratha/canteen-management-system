@@ -79,11 +79,11 @@ export default function AdminDashboardPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8 rounded-2xl bg-gradient-to-r from-dark-950 to-primary-900/30 p-8 text-white"
+            className="mb-8 rounded-2xl bg-linear-to-r from-dark-950 to-primary-900/30 p-8 text-white"
           >
             <p className="text-primary-400 font-semibold mb-1">Welcome back 👋</p>
             <h2 className="text-3xl font-black">{user?.name || "Admin"}</h2>
-            <p className="mt-1 text-white/50">Here's what's happening in your canteen today.</p>
+            <p className="mt-1 text-white/50">Here&apos;s what&apos;s happening in your canteen today.</p>
           </motion.div>
 
           {/* Stats */}

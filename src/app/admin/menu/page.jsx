@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Sidebar from "@/components/layout/Sidebar";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -9,13 +8,160 @@ import Modal from "@/components/ui/Modal";
 import Badge from "@/components/ui/Badge";
 import { useAuth } from "@/hooks/useAuth";
 import { createFood, deleteFood, getMenu, updateFood } from "@/services/menuService";
+import { uploadFoodImage } from "@/services/cloudinaryService";
 import { formatCurrency } from "@/utils/helpers";
-import { Plus, Pencil, Trash2, Search, UtensilsCrossed, ToggleLeft, ToggleRight } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, UtensilsCrossed, ToggleLeft, ToggleRight, Upload, Image as ImageIcon, X, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import Image from "next/image";
 const CATEGORIES = ["Starters", "Main Course", "Beverages", "Desserts", "Snacks", "Breakfast"];
 const FOOD_EMOJIS = { "Starters": "🥗", "Main Course": "🍛", "Beverages": "🧃", "Desserts": "🍰", "Snacks": "🍟", "Breakfast": "🍳" };
-const initialForm = { name: "", price: "", category: "Main Course", image: "", available: true };
+const initialForm = { name: "", price: "", category: "Main Course", image: "", imageKey: "", available: true };
+
+function FoodForm({ data, setData, onSubmit, submitLabel, onCancel, saving, token }) {
+  const fileInputRef = useRef(null);
+  const [preview, setPreview] = useState(data.image || "");
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  useEffect(() => {
+    setPreview(data.image || "");
+  }, [data.image]);
+
+  useEffect(() => {
+    return () => {
+      if (preview?.startsWith("blob:")) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
+
+  async function handleFileChange(event) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const localPreview = URL.createObjectURL(file);
+    setPreview(localPreview);
+    setUploadingImage(true);
+
+    try {
+      const uploaded = await uploadFoodImage(file, token);
+      setData((prev) => ({
+        ...prev,
+        image: uploaded.image,
+        imageKey: uploaded.imageKey,
+      }));
+      setPreview(uploaded.image);
+      toast.success("Image uploaded");
+    } catch (error) {
+      setPreview(data.image || "");
+      toast.error(error.message || "Image upload failed");
+    } finally {
+      setUploadingImage(false);
+      event.target.value = "";
+    }
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="max-h-[70vh] space-y-3 overflow-y-auto pr-1">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Input label="Food Name" required value={data.name} onChange={(e) => setData((p) => ({ ...p, name: e.target.value }))} placeholder="e.g. Butter Chicken" />
+        <Input label="Price (₹)" type="number" required min="1" value={data.price} onChange={(e) => setData((p) => ({ ...p, price: e.target.value }))} placeholder="99" />
+        <div>
+          <label className="mb-1.5 block text-sm font-semibold text-dark-700">Category</label>
+          <select
+            value={data.category}
+            onChange={(e) => setData((p) => ({ ...p, category: e.target.value }))}
+            className="w-full rounded-xl border-2 border-dark-200 bg-white px-4 py-3 text-sm text-dark-900 outline-none focus:border-primary-400"
+          >
+            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="sm:col-span-2 rounded-2xl border border-dark-200 bg-dark-50 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-dark-900">Food Image</p>
+              <p className="text-xs text-dark-500">Upload to Cloudinary before saving</p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              icon={Upload}
+              loading={uploadingImage}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {preview ? "Change Image" : "Upload Image"}
+            </Button>
+          </div>
+
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+
+          <div className="mt-4 overflow-hidden rounded-2xl border border-dashed border-dark-200 bg-white">
+            {preview ? (
+              <div className="relative aspect-video w-full">
+                <Image width={100} height={100} src={preview} alt={data.name || "Food preview"} className="h-full w-full object-cover" />
+
+                {uploadingImage && (
+                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-dark-950/40 backdrop-blur-sm">
+                    <div className="flex items-center gap-2 rounded-xl bg-white/20 px-3 py-2 text-xs font-semibold text-white">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Uploading image...
+                    </div>
+                  </div>
+                )}
+
+                <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 bg-linear-to-t from-dark-950/75 to-transparent p-3">
+                  <span className="truncate text-xs font-semibold text-white">{data.imageKey ? "Uploaded to Cloudinary" : "Preview ready"}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setData((p) => ({ ...p, image: "", imageKey: "" }));
+                      setPreview("");
+                    }}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25"
+                    aria-label="Remove image"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="relative flex h-44 items-center justify-center text-center">
+                {uploadingImage && (
+                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-dark-950/35 backdrop-blur-sm">
+                    <div className="flex items-center gap-2 rounded-xl bg-dark-950/50 px-3 py-2 text-xs font-semibold text-white">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Uploading image...
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
+                    <ImageIcon className="h-6 w-6" />
+                  </div>
+                  <p className="text-sm font-semibold text-dark-700">No image selected</p>
+                  <p className="text-xs text-dark-500">PNG, JPG, WEBP supported by your Cloudinary settings</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center gap-3">
+        <button type="button" onClick={() => setData((p) => ({ ...p, available: !p.available }))}>
+          {data.available
+            ? <ToggleRight className="h-7 w-7 text-emerald-500" />
+            : <ToggleLeft className="h-7 w-7 text-dark-400" />}
+        </button>
+        <span className="text-sm font-semibold text-dark-700">{data.available ? "Available" : "Unavailable"}</span>
+      </div>
+      <div className="flex gap-3 pt-2">
+        <Button type="submit" loading={saving} disabled={uploadingImage} size="md">{submitLabel}</Button>
+        <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
+      </div>
+    </form>
+  );
+}
 
 export default function AdminMenuPage() {
   const { token } = useAuth();
@@ -85,40 +231,6 @@ export default function AdminMenuPage() {
 
   const filtered = foods.filter((f) => f.name?.toLowerCase().includes(search.toLowerCase()));
 
-  function FoodForm({ data, setData, onSubmit, submitLabel }) {
-    return (
-      <form onSubmit={onSubmit} className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Input label="Food Name" required value={data.name} onChange={(e) => setData((p) => ({ ...p, name: e.target.value }))} placeholder="e.g. Butter Chicken" />
-          <Input label="Price (₹)" type="number" required min="1" value={data.price} onChange={(e) => setData((p) => ({ ...p, price: e.target.value }))} placeholder="99" />
-          <div>
-            <label className="mb-1.5 block text-sm font-semibold text-dark-700">Category</label>
-            <select
-              value={data.category}
-              onChange={(e) => setData((p) => ({ ...p, category: e.target.value }))}
-              className="w-full rounded-xl border-2 border-dark-200 bg-white px-4 py-3 text-sm text-dark-900 outline-none focus:border-primary-400"
-            >
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
-          <Input label="Image URL (optional)" value={data.image || ""} onChange={(e) => setData((p) => ({ ...p, image: e.target.value }))} placeholder="https://..." />
-        </div>
-        <div className="flex items-center gap-3">
-          <button type="button" onClick={() => setData((p) => ({ ...p, available: !p.available }))}>
-            {data.available
-              ? <ToggleRight className="h-7 w-7 text-emerald-500" />
-              : <ToggleLeft className="h-7 w-7 text-dark-400" />}
-          </button>
-          <span className="text-sm font-semibold text-dark-700">{data.available ? "Available" : "Unavailable"}</span>
-        </div>
-        <div className="flex gap-3 pt-2">
-          <Button type="submit" loading={saving} size="md">{submitLabel}</Button>
-          <Button type="button" variant="ghost" onClick={() => { setEditing(null); setAddOpen(false); }}>Cancel</Button>
-        </div>
-      </form>
-    );
-  }
-
   return (
     <div className="flex h-screen overflow-hidden bg-dark-50">
       <Sidebar />
@@ -176,16 +288,18 @@ export default function AdminMenuPage() {
                     filtered.map((food) => {
                       const emoji = FOOD_EMOJIS[food.category] || "🍽️";
                       return (
-                        <motion.tr
+                        <tr
                           key={food._id}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
                           className="hover:bg-dark-50 transition-colors group"
                         >
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
                               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-xl shrink-0">
-                                <img className="h-6 w-6 object-cover" src={food.image || `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='50%' x='50%' dominant-baseline='middle' text-anchor='middle' font-size='50'>${emoji}</text></svg>`} alt={food.name} width={40} height={40} />
+                                {food.image ? (
+                                  <Image width={50} height={50} className="h-12 w-12 rounded-2xl object-contain" src={food.image} alt={food.name} />
+                                ) : (
+                                  <span>{emoji}</span>
+                                )}
                               </div>
                               <p className="font-semibold text-dark-900">{food.name}</p>
                             </div>
@@ -200,7 +314,7 @@ export default function AdminMenuPage() {
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
                               <button
-                                onClick={() => setEditing(food)}
+                                onClick={() => setEditing({ ...food })}
                                 className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
                               >
                                 <Pencil className="h-4 w-4" />
@@ -213,7 +327,7 @@ export default function AdminMenuPage() {
                               </button>
                             </div>
                           </td>
-                        </motion.tr>
+                        </tr>
                       );
                     })
                   )}
@@ -226,12 +340,12 @@ export default function AdminMenuPage() {
 
       {/* Add Modal */}
       <Modal open={addOpen} title="Add New Food Item" onClose={() => setAddOpen(false)} size="lg">
-        <FoodForm data={form} setData={setForm} onSubmit={handleCreate} submitLabel="Add Item" />
+        <FoodForm data={form} setData={setForm} onSubmit={handleCreate} submitLabel="Add Item" onCancel={() => setAddOpen(false)} saving={saving} token={token} />
       </Modal>
 
       {/* Edit Modal */}
       <Modal open={Boolean(editing)} title="Edit Food Item" onClose={() => setEditing(null)} size="lg">
-        {editing && <FoodForm data={editing} setData={setEditing} onSubmit={handleUpdate} submitLabel="Save Changes" />}
+        {editing && <FoodForm data={editing} setData={setEditing} onSubmit={handleUpdate} submitLabel="Save Changes" onCancel={() => setEditing(null)} saving={saving} token={token} />}
       </Modal>
 
       {/* Delete Confirm Modal */}
