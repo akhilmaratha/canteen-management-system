@@ -131,7 +131,7 @@ export default function AdminSettingsPage() {
                         onClick={() => handleChange(key, !settings[key])}
                         className={`relative h-6 w-11 rounded-full transition-colors ${settings[key] ? "bg-primary-500" : "bg-dark-200"}`}
                       >
-                        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${settings[key] ? "translate-x-5" : "translate-x-0.5"}`} />
+                        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${settings[key] ? "translate-x-0.1" : "-translate-x-5"}`} />
                       </button>
                     </div>
                   ))}

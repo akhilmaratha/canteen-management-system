@@ -23,7 +23,7 @@ export default function FoodCard({ food, onAdd, onEdit, onDelete, adminMode = fa
     >
       {/* Image / Placeholder */}
       <div className="relative h-48 overflow-hidden bg-linear-to-br from-primary-50 to-accent-300/20">
-        {food.image && food.image.startsWith("/") && food.image !== "/next.svg" ? (
+        {food.image && food.image !== "/next.svg" ? (
           <Image src={food.image} alt={food.name} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" width={200} height={200} />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
